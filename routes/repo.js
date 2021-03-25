@@ -5,6 +5,9 @@ const Repo = require('../models/repo');
 const xlsx = require('xlsx');
 const mongoose = require('mongoose');
 const async = require('async');
+const config = require('../config');
+const client = require('twilio')(config.ACCOUNT_SID, config.AUTH_TOKEN);
+const createError = require('http-errors');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './uploads/');
@@ -36,18 +39,10 @@ router.post('/add',upload.single('file_name'),(req, res, next) => {
     console.log(data.length);  
     
     data.map((record)=>{
-     const CustomerName =   record.CustomerName;
-     const RCNo = record.RCNo;
-     const EngineNo = record.EngineNo;
-     const ChassisNo = record.ChassisNo;
+     const RCNo = record.RCNO;
     const test = new Repo({
         _id: new mongoose.Types.ObjectId(),
-        customer_name:  CustomerName ? CustomerName : "",
-        rc_number : RCNo ? RCNo : "",
-        chassis_number : ChassisNo ? ChassisNo : "",
-        engine_number :  EngineNo ? EngineNo : "",
-        file_name :   req.file.path
-       
+        vehicle_number : RCNo
     });
     test.save().then(result => {
         
@@ -57,7 +52,8 @@ router.post('/add',upload.single('file_name'),(req, res, next) => {
     })
     res.status(201).json({
         statusCode : 201,
-        message: data.length + "  " +'Updated Successfully',
+        message: "success",
+        totalVehicleCount : data.length
     });
     
 
@@ -65,34 +61,17 @@ router.post('/add',upload.single('file_name'),(req, res, next) => {
 });
 
 router.get('/',(req,res,next) => {
-    let query = req.body;
-    let mysort;
-    // if (req.body.priceDefined) {
-    //     query['price'] = { $gte: (query.priceDefined[0]), $lte: (query.priceDefined[1]) }
-    //     delete query['priceDefined']
-    // }
-    // if(req.body.start_date){
-    //     query['start_date'] = { $gte : searchKeyword}
-    //     console.log(query)
-    // }
-    // if(req.query.sortBy == 'asc'){
-    //     mysort = {price : 1}
-    // }else if(req.query.sortBy == 'desc'){
-    //     mysort = {price : -1}
-    // }else{
-    //     mysort = {createdAt : -1}
-    // }
     var condition = req.query.rc;
     var regex = new RegExp(condition.toLowerCase(), 'i');
     async.parallel([
         function (callback) {
-            Repo.countDocuments({rc_number : regex}, (err, count) => {
+            Repo.countDocuments({vehicle_number : regex}, (err, count) => {
                 let totalrepos = count;
                 callback(err, totalrepos);
             });
         },
         function (callback) {
-            Repo.find({rc_number : regex}).select('-file_name -__v')
+            Repo.find({vehicle_number : regex}).select('-file_name -__v -_id' )
                 .exec((err, repos) => {
                     if (err) return next(err);
                     callback(err, repos);
@@ -107,11 +86,60 @@ router.get('/',(req,res,next) => {
             statusCode: 200,
             message: "success",
             parameters: condition,
-            totalrepos : totalrepos,
+            totalVehicleCount : totalrepos,
             data : repos
         });
     });
 });
+
+router.get('/sendOtp',async (req, res, next) => {
+    await client
+      .verify
+      .services(config.SERVICE_ID)
+      .verifications
+      .create({
+        to: `+918108481831`,
+        channel: "sms"
+      }).then(data => {
+        res.status(200).json({
+          statusCode : 200,
+          message: "VERIFICATION SEND SUCCESSFULLY",
+          data
+        });
+      }).catch(err => {
+        next(err)
+      });
+  });
+
+router.get('/verifyOtp', (req, res, next) => {
+    if ((req.query.code).length === 6) {
+      client
+        .verify
+        .services(config.SERVICE_ID)
+        .verificationChecks
+        .create({
+          to: `+918108481831`,
+          code: req.query.code
+        })
+        .then(data => {
+          if (data.status === "approved") {
+            res.status(200).json({
+              statusCode : 200,
+              message: "USER IS VERIFIED!!",
+              data
+            })
+          }else throw createError.NotAcceptable('Enter Correct Otp');
+        }).catch(err => {
+          next(createError.NotFound('OTP EXPIRED PLEASE SEND OTP AGIAN'))
+        });
+    } else {
+      res.status(400).json({
+        statusCode : 400,
+        message: "WRONG CODE :(",
+        code : req.query.code
+      })
+    }
+  });
 
 
 module.exports = router;
