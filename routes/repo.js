@@ -42,10 +42,10 @@ router.post('/add',upload.single('file_name'),(req, res, next) => {
      const ChassisNo = record.ChassisNo;
     const test = new Repo({
         _id: new mongoose.Types.ObjectId(),
-        customer_name: CustomerName,
-        rc_number : RCNo,
-        chassis_number : ChassisNo,
-        engine_number :  EngineNo,
+        customer_name:  CustomerName ? CustomerName : "",
+        rc_number : RCNo ? RCNo : "",
+        chassis_number : ChassisNo ? ChassisNo : "",
+        engine_number :  EngineNo ? EngineNo : "",
         file_name :   req.file.path
        
     });
