@@ -141,5 +141,31 @@ router.get('/verifyOtp', (req, res, next) => {
     }
   });
 
+  router.post('/vehicle/add',(req,res,next)=>{
+    const vehicle = new Repo({
+        _id: new mongoose.Types.ObjectId(),
+        vehicle_number : req.body.vehicle_number
+    })
+    vehicle.save()
+        .then(data => {
+            res.status(201).json({
+                statusCode: 201,
+                message: "Created Successfully",
+                data: data
+            });
+        }).catch(err => { next(err) });
+  });
+
+  router.delete('/vehicle/delete/:id',async (req,res,next)=>{
+    const deletedProduct = await Repo.findByIdAndRemove(req.params.id);
+    if(!deletedProduct){
+        next(createError.NotAcceptable("Something went wrong"));
+    }
+            res.status(200).json({
+                statusCode: 200,
+                message: "Vehicle Deleted Successfully",
+                data: deletedProduct
+            });
+  });
 
 module.exports = router;
