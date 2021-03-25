@@ -82,15 +82,17 @@ router.get('/',(req,res,next) => {
     // }else{
     //     mysort = {createdAt : -1}
     // }
+    var condition = req.query.rc;
+    var regex = new RegExp(condition.toLowerCase(), 'i');
     async.parallel([
         function (callback) {
-            Repo.countDocuments(query, (err, count) => {
+            Repo.countDocuments({rc_number : regex}, (err, count) => {
                 let totalrepos = count;
                 callback(err, totalrepos);
             });
         },
         function (callback) {
-            Repo.find({})
+            Repo.find({rc_number : regex}).select('-file_name -__v')
                 .exec((err, repos) => {
                     if (err) return next(err);
                     callback(err, repos);
@@ -104,7 +106,7 @@ router.get('/',(req,res,next) => {
         res.status(200).json({
             statusCode: 200,
             message: "success",
-            parameters: req.body,
+            parameters: condition,
             totalrepos : totalrepos,
             data : repos
         });
