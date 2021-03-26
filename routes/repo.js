@@ -98,7 +98,7 @@ router.get('/sendOtp',async (req, res, next) => {
       .services(config.SERVICE_ID)
       .verifications
       .create({
-        to: `+919004879919`,
+        to: `+918108481831`,
         channel: "sms"
       }).then(data => {
         res.status(200).json({
