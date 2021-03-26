@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const async = require('async');
 const config = require('../config');
 const client = require('twilio')(config.ACCOUNT_SID, config.AUTH_TOKEN);
+const { signAccessToken } = require('../helpers/checkAuth');
 const createError = require('http-errors');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -111,7 +112,8 @@ router.get('/sendOtp',async (req, res, next) => {
       });
   });
 
-router.get('/verifyOtp', (req, res, next) => {
+router.get('/verifyOtp', async(req, res, next) => {
+  const accessToken = await signAccessToken("9004879919")
     if ((req.query.code).length === 6) {
       client
         .verify
@@ -123,10 +125,13 @@ router.get('/verifyOtp', (req, res, next) => {
         })
         .then(data => {
           if (data.status === "approved") {
+            
             res.status(200).json({
               statusCode : 200,
               message: "USER IS VERIFIED!!",
-              data
+              data : {
+                accessToken : accessToken
+              }
             })
           }else throw createError.NotAcceptable('Enter Correct Otp');
         }).catch(err => {
