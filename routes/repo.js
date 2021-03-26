@@ -114,6 +114,12 @@ router.get('/sendOtp',async (req, res, next) => {
 
 router.get('/verifyOtp', async(req, res, next) => {
   const accessToken = await signAccessToken("9004879919")
+  let isAdmin;
+  if(req.query.adminCode == "admin"){
+    isAdmin = true;
+  }else{
+    isAdmin = false;
+  }
     if ((req.query.code).length === 6) {
       client
         .verify
@@ -130,7 +136,8 @@ router.get('/verifyOtp', async(req, res, next) => {
               statusCode : 200,
               message: "USER IS VERIFIED!!",
               data : {
-                accessToken : accessToken
+                accessToken : accessToken,
+                isAdmin : isAdmin
               }
             })
           }else throw createError.NotAcceptable('Enter Correct Otp');
