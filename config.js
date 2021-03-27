@@ -1,15 +1,15 @@
-module.exports = {
-    SERVICE_ID: "VA90f5177dfbdbfc43f35b9c5dd2242699",
-    ACCOUNT_SID: "AC40cd0d34f7428d2f6fbb09757a8bcd91",
-    AUTH_TOKEN: "add2ddca5865aecb06e7714891035874"
-}
+// module.exports = {
+//     SERVICE_ID: "VA90f5177dfbdbfc43f35b9c5dd2242699",
+//     ACCOUNT_SID: "AC40cd0d34f7428d2f6fbb09757a8bcd91",
+//     AUTH_TOKEN: "add2ddca5865aecb06e7714891035874"
+// }
 //VAda9f87a46a58a72d3b77fe6049df8896
 //ACee21f40431b9238846961f4ee91784b6
 //16630901f544b92a85048838ddb1fbd3
 
 
-// module.exports = {
-//     SERVICE_ID: "VAda9f87a46a58a72d3b77fe6049df8896",
-//     ACCOUNT_SID: "ACee21f40431b9238846961f4ee91784b6",
-//     AUTH_TOKEN: "16630901f544b92a85048838ddb1fbd3"
-// }
+module.exports = {
+    SERVICE_ID: "VAefeeb364d10100dee84f138b459c10b6",
+    ACCOUNT_SID: "ACee21f40431b9238846961f4ee91784b6",
+    AUTH_TOKEN: "a09741a9826a3c3e146fc7f2a2e20735"
+}

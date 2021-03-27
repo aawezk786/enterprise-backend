@@ -99,7 +99,7 @@ router.get('/sendOtp',async (req, res, next) => {
       .services(config.SERVICE_ID)
       .verifications
       .create({
-        to: `+919004879919`,
+        to:  `+918355820881`,
         channel: "sms"
       }).then(data => {
         res.status(200).json({
@@ -126,7 +126,7 @@ router.get('/verifyOtp', async(req, res, next) => {
         .services(config.SERVICE_ID)
         .verificationChecks
         .create({
-          to: `+919004879919`,
+          to: `+918355820881`,
           code: req.query.code
         })
         .then(data => {
