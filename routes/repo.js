@@ -180,4 +180,34 @@ router.get('/verifyOtp', async(req, res, next) => {
             });
   });
 
+  router.get('/all',(req,res,next) => {
+    // var condition = req.query.rc;
+    // var regex = new RegExp(condition.toLowerCase(), 'i');
+    async.parallel([
+        function (callback) {
+            Repo.countDocuments({}, (err, count) => {
+                let totalrepos = count;
+                callback(err, totalrepos);
+            });
+        },
+        function (callback) {
+            Repo.find({}).select('-file_name -__v -_id' )
+                .exec((err, repos) => {
+                    if (err) return next(err);
+                    callback(err, repos);
+                });
+        }
+    ], function (err, result) {
+        console.log(err)
+        if (err) return next(err);
+        let totalrepos = result[0];
+        let repos = result[1];
+        res.status(200).json({
+            statusCode: 200,
+            message: "success",
+            totalVehicleCount : totalrepos,
+            data : repos
+        });
+    });
+});
 module.exports = router;
